@@ -5,6 +5,7 @@ global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
 
 const canvasSketch = require('canvas-sketch')
+const { Scene } = require( 'three' )
 
 const settings = {
   // Make the loop animated
@@ -24,7 +25,7 @@ const sketch = ({ context }) => {
 
   // Setup a camera
   const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 100)
-  camera.position.set(0, 0, -4)
+  camera.position.set(3, 3, -5)
   camera.lookAt(new THREE.Vector3())
 
   // Setup camera controller
@@ -36,16 +37,30 @@ const sketch = ({ context }) => {
   // Setup a geometry
   const geometry = new THREE.SphereGeometry(1, 32, 16)
 
+  // loader
+  const loader = new THREE.TextureLoader();
+
+  // texture
+  const texture = loader.load("earth.jpg")
+  const moonTexture = loader.load("moon.jpg")
+
   // Setup a material
   const material = new THREE.MeshBasicMaterial({
-    color: 'red',
-    wireframe: true,
+    map: texture
+  })
+
+  const moonMaterial = new THREE.MeshBasicMaterial({
+    map: moonTexture
   })
 
   // Setup a mesh with geometry + material
   const mesh = new THREE.Mesh(geometry, material)
   scene.add(mesh)
 
+  const moonMesh = new THREE.Mesh(geometry, moonMaterial);
+  moonMesh.position.set(1.5, 0.5, 0)
+  moonMesh.scale.setScalar(0.25)
+  scene.add(moonMesh)
   // draw each frame
   return {
     // Handle resize events here
@@ -57,6 +72,8 @@ const sketch = ({ context }) => {
     },
     // Update & render your scene here
     render({ time }) {
+      mesh.rotation.y = time * 0.15
+      moonMesh.rotation.y = time * 0.075
       controls.update()
       renderer.render(scene, camera)
     },
