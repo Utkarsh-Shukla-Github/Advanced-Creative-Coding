@@ -74,8 +74,18 @@ const sketch = ({ context }) => {
 
   // Light
   const light = new THREE.PointLight('white', 2)
-  light.position.set(2,2,2)
+  light.position.set(0,2,0)
   scene.add(light)
+
+  // Grid Helper
+  scene.add(new THREE.GridHelper(5, 50))
+
+  // Light Helper
+  scene.add(new THREE.PointLightHelper(light, 0.15))
+
+  // Axes Helper
+  let axesHelper = new THREE.AxesHelper(5)
+  scene.add(axesHelper)
 
   // draw each frame
   return {
