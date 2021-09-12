@@ -52,16 +52,17 @@ const sketch = ({ context }) => {
       vec2 center = vec2(0.5);
       vec2 pos = mod(vUv * 5.0, 1.0);
       float dist = distance(pos, center);
-      float mask = step(0.25 + sin(time + vUv.x * 10.5) * 0.25, dist);
+      float mask = step(0.25 + sin(time + vUv.x * 2.0) * 0.25, dist);
       mask = 1.0 - mask;
-      gl_FragColor = vec4(vec3(mask), 1.0);
+      vec3 fragColor = mix(color, vec3(1.0, 1.0, 1.0), mask);
+      gl_FragColor = vec4(vec3(fragColor), 1.0);
     }
   `
   // Setup a material
   const material = new THREE.ShaderMaterial({
     uniforms: {
       time: { value: 0 },
-      color: { value: new THREE.Color('#fff') },
+      color: { value: new THREE.Color('tomato') },
     },
     // wireframe: true,
     vertexShader,
