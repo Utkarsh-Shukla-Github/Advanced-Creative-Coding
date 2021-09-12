@@ -49,12 +49,7 @@ const sketch = ({ context }) => {
   uniform  vec3 color;
   uniform  float time;
     void main() {
-      vec2 center = vec2(0.5);
-      vec2 pos = mod(vUv * 5.0, 1.0);
-      float dist = distance(pos, center);
-      float mask = step(0.25 + sin(time + vUv.x * 10.5) * 0.25, dist);
-      mask = 1.0 - mask;
-      gl_FragColor = vec4(vec3(mask), 1.0);
+      gl_FragColor = vec4(vec3(vUv.x + sin(time),vUv.x,vUv.y + cos(time))*color, 1.0);
     }
   `
   // Setup a material
