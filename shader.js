@@ -5,7 +5,6 @@ global.THREE = require('three')
 require('three/examples/js/controls/OrbitControls')
 
 const canvasSketch = require('canvas-sketch')
-const { Scene } = require('three')
 
 const settings = {
   // Make the loop animated
@@ -21,11 +20,11 @@ const sketch = ({ context }) => {
   })
 
   // WebGL background color
-  renderer.setClearColor('black', 1)
+  renderer.setClearColor('#fff', 1)
 
   // Setup a camera
   const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 100)
-  camera.position.set(3, 3, -5)
+  camera.position.set(0, 0, -4)
   camera.lookAt(new THREE.Vector3())
 
   // Setup camera controller
@@ -35,57 +34,33 @@ const sketch = ({ context }) => {
   const scene = new THREE.Scene()
 
   // Setup a geometry
-  const geometry = new THREE.SphereGeometry(1, 32, 16)
+  const geometry = new THREE.BoxGeometry(1, 1, 1)
 
-  // loader
-  const loader = new THREE.TextureLoader()
+  const vertexShader = /* glsl */ `
+  varying  vec2 vUv;
+   void main() {
+     vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position.xyz, 1.0);
+   }
+  `
 
-  // texture
-  const texture = loader.load('earth.jpg')
-  const moonTexture = loader.load('moon.jpg')
-
+  const fragmentShader = /* glsl */ `
+  varying  vec2 vUv;
+    void main() {
+      gl_FragColor = vec4(vec3(vUv.x), 1.0);
+    }
+  `
   // Setup a material
-  const material = new THREE.MeshStandardMaterial({
-    roughness: 1,
-    metalness: 0,
-    map: texture,
-  })
-
-  // group
-  const moonGroup = new THREE.Group()
-
-  // moon Material
-  const moonMaterial = new THREE.MeshStandardMaterial({
-    roughness: 1,
-    metalness: 0,
-    map: moonTexture,
+  const material = new THREE.ShaderMaterial({
+    // color: 'red',
+    // wireframe: true,
+    vertexShader,
+    fragmentShader,
   })
 
   // Setup a mesh with geometry + material
   const mesh = new THREE.Mesh(geometry, material)
   scene.add(mesh)
-
-  const moonMesh = new THREE.Mesh(geometry, moonMaterial)
-  moonMesh.position.set(1.5, 1, 0)
-  moonMesh.scale.setScalar(0.25)
-  moonGroup.add(moonMesh)
-
-  scene.add(moonGroup)
-
-  // Light
-  const light = new THREE.PointLight('white', 2)
-  light.position.set(2, 2, 0)
-  moonGroup.add(light)
-
-  // Grid Helper
-  scene.add(new THREE.GridHelper(5, 50))
-
-  // Light Helper
-  scene.add(new THREE.PointLightHelper(light, 0.15))
-
-  // Axes Helper
-  let axesHelper = new THREE.AxesHelper(5)
-  scene.add(axesHelper)
 
   // draw each frame
   return {
@@ -98,10 +73,6 @@ const sketch = ({ context }) => {
     },
     // Update & render your scene here
     render({ time }) {
-      mesh.rotation.y = time * 0.15
-      moonMesh.rotation.y = time * 0.075
-      moonGroup.rotation.y = time * 0.5
-
       controls.update()
       renderer.render(scene, camera)
     },
