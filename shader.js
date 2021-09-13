@@ -54,6 +54,7 @@ const sketch = ({ context }) => {
 
   const fragmentShader = glsl(/* glsl */ `
   #pragma glslify: noise = require('glsl-noise/simplex/3d')
+  #pragma glslify: aastep = require('glsl-aastep') 
   varying  vec2 vUv;
   varying  vec3 vPosition;
 
@@ -78,7 +79,7 @@ const sketch = ({ context }) => {
       float d = distance(vPosition, points[i]);
       dist = min(dist, d);
     }
-    float mask = step(0.25, dist);
+    float mask = aastep(0.15, dist);
     mask = 1.0 - mask;
 
     vec3 fragColor = mix(color, vec3(1.0), mask);
@@ -94,6 +95,9 @@ const sketch = ({ context }) => {
   const material = new THREE.ShaderMaterial({
     defines: {
       POINT_COUNT: points.length,
+    },
+    extensions: {
+      derivatives: true,
     },
     uniforms: {
       points: { value: points },
